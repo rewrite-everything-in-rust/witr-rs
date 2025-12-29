@@ -21,7 +21,7 @@ pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
 
             let proto = parts[0];
             let local_addr = parts[1];
-            
+
             let mut pid_str = "";
             let mut is_listening = false;
 
@@ -34,8 +34,8 @@ pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
                     }
                 }
             } else if proto == "UDP" && parts.len() >= 4 {
-                 pid_str = parts.last().unwrap();
-                 is_listening = true;
+                pid_str = parts.last().unwrap();
+                is_listening = true;
             }
 
             if is_listening {
@@ -76,8 +76,8 @@ pub fn get_sockets_for_pid(target_pid: u32) -> Vec<u64> {
 
             if let Ok(pid) = pid_str.parse::<u32>() {
                 if pid == target_pid {
-                    let valid = (proto == "TCP" && parts.len() >= 5 && parts[3] == "LISTENING") 
-                             || (proto == "UDP");
+                    let valid = (proto == "TCP" && parts.len() >= 5 && parts[3] == "LISTENING")
+                        || (proto == "UDP");
 
                     if valid {
                         if let Some(port_part) = local_addr.rsplit(':').next() {

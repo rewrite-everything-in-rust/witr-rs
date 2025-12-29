@@ -16,13 +16,13 @@ pub mod supervisor;
 #[cfg(target_os = "macos")]
 pub use darwin::*;
 
-#[cfg(target_os = "linux")]
-pub use linux::*;
 pub use container::*;
 pub use cron::*;
 pub use detect::*;
 pub use git::*;
 pub use health::*;
+#[cfg(target_os = "linux")]
+pub use linux::*;
 pub use network::*;
 pub use service::*;
 pub use shell::*;
