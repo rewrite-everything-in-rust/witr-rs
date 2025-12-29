@@ -8,7 +8,7 @@ pub fn get_open_fds(pid: u32) -> Vec<u64> {
         let output_str = String::from_utf8_lossy(&output.stdout);
         return parse_lsof_fds(&output_str);
     }
-    
+
     Vec::new()
 }
 

@@ -47,10 +47,10 @@ mod tests {
    1: 0100007F:0277 0100007F:1F90 01 00000000:00000000 00:00000000 00000000  1000        0 24159 1 0000000000000000 100 0 0 10 0
 ";
         let states = parse_tcp_states(content);
-        
+
         // Inode 21623, State 0A -> LISTEN
         assert_eq!(states.get(&21623).map(|s| s.as_str()), Some("LISTEN"));
-        
+
         // Inode 24159, State 01 -> ESTABLISHED
         assert_eq!(states.get(&24159).map(|s| s.as_str()), Some("ESTABLISHED"));
     }

@@ -23,10 +23,13 @@ fn parse_tcp_file(content: &str) -> HashMap<u64, SocketInfo> {
                 if addr_parts.len() == 2 {
                     if let Ok(port) = u16::from_str_radix(addr_parts[1], 16) {
                         if let Ok(inode) = parts[9].parse::<u64>() {
-                            sockets.insert(inode, SocketInfo {
-                                port,
-                                local_addr: "0.0.0.0".to_string(), // In real implementation we might parse IP too
-                            });
+                            sockets.insert(
+                                inode,
+                                SocketInfo {
+                                    port,
+                                    local_addr: "0.0.0.0".to_string(), // In real implementation we might parse IP too
+                                },
+                            );
                         }
                     }
                 }
@@ -39,7 +42,7 @@ fn parse_tcp_file(content: &str) -> HashMap<u64, SocketInfo> {
 pub fn get_sockets_for_pid(pid: u32) -> Vec<u64> {
     let mut inodes = Vec::new();
     let fd_dir = format!("/proc/{}/fd", pid);
-    
+
     if let Ok(entries) = fs::read_dir(&fd_dir) {
         for entry in entries.flatten() {
             if let Ok(link) = fs::read_link(entry.path()) {
@@ -50,13 +53,16 @@ pub fn get_sockets_for_pid(pid: u32) -> Vec<u64> {
             }
         }
     }
-    
+
     inodes
 }
 
 fn parse_socket_link(link: &str) -> Option<u64> {
     if link.starts_with("socket:[") {
-        if let Some(inode_str) = link.strip_prefix("socket:[").and_then(|s| s.strip_suffix(']')) {
+        if let Some(inode_str) = link
+            .strip_prefix("socket:[")
+            .and_then(|s| s.strip_suffix(']'))
+        {
             return inode_str.parse::<u64>().ok();
         }
     }
@@ -75,11 +81,11 @@ mod tests {
 ";
         let sockets = parse_tcp_file(content);
         assert_eq!(sockets.len(), 2);
-        
+
         // 1F90 hex = 8080 decimal, inode 21623
         let s1 = sockets.get(&21623).unwrap();
         assert_eq!(s1.port, 8080);
-        
+
         // 0277 hex = 631 decimal, inode 24159
         let s2 = sockets.get(&24159).unwrap();
         assert_eq!(s2.port, 631);

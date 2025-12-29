@@ -8,7 +8,7 @@ pub fn get_open_files(pid: u32) -> Vec<String> {
         let output_str = String::from_utf8_lossy(&output.stdout);
         return parse_lsof_files(&output_str);
     }
-    
+
     Vec::new()
 }
 

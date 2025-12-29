@@ -61,7 +61,11 @@ impl SystemProvider for RealSystem {
             pid,
             parent_pid,
             name: process.name().to_string_lossy().to_string(),
-            cmd: process.cmd().iter().map(|s| s.to_string_lossy().to_string()).collect(),
+            cmd: process
+                .cmd()
+                .iter()
+                .map(|s| s.to_string_lossy().to_string())
+                .collect(),
             exe_path: process.exe().map(|p| p.display().to_string()),
             uid: process.user_id().map(|u| u.to_string()),
             username: None,
@@ -75,7 +79,11 @@ impl SystemProvider for RealSystem {
             bind_addrs,
             health: health_status,
             forked,
-            env: process.environ().iter().map(|s| s.to_string_lossy().to_string()).collect(),
+            env: process
+                .environ()
+                .iter()
+                .map(|s| s.to_string_lossy().to_string())
+                .collect(),
         })
     }
 
@@ -106,7 +114,11 @@ impl SystemProvider for RealSystem {
                     pid,
                     parent_pid,
                     name: process.name().to_string_lossy().to_string(),
-                    cmd: process.cmd().iter().map(|s| s.to_string_lossy().to_string()).collect(),
+                    cmd: process
+                        .cmd()
+                        .iter()
+                        .map(|s| s.to_string_lossy().to_string())
+                        .collect(),
                     exe_path: process.exe().map(|p| p.display().to_string()),
                     uid: process.user_id().map(|u| u.to_string()),
                     username: None,
@@ -120,13 +132,20 @@ impl SystemProvider for RealSystem {
                     bind_addrs,
                     health: health_status,
                     forked,
-                    env: process.environ().iter().map(|s| s.to_string_lossy().to_string()).collect(),
+                    env: process
+                        .environ()
+                        .iter()
+                        .map(|s| s.to_string_lossy().to_string())
+                        .collect(),
                 });
             }
         }
 
         if results.is_empty() {
-            Err(SystemError::ProcessNotFound(format!("No processes matching '{}'", name_query)))
+            Err(SystemError::ProcessNotFound(format!(
+                "No processes matching '{}'",
+                name_query
+            )))
         } else {
             Ok(results)
         }
@@ -140,7 +159,7 @@ impl SystemProvider for RealSystem {
                 for (sys_pid, process) in self.sys.processes() {
                     let pid = sys_pid.as_u32();
                     let fds = network::get_sockets_for_pid(pid);
-                    
+
                     if fds.contains(fd) {
                         let parent_pid = process.parent().map(|p| p.as_u32());
                         let (ports, bind_addrs) = self.get_network_info(pid);
@@ -161,7 +180,11 @@ impl SystemProvider for RealSystem {
                             pid,
                             parent_pid,
                             name: process.name().to_string_lossy().to_string(),
-                            cmd: process.cmd().iter().map(|s| s.to_string_lossy().to_string()).collect(),
+                            cmd: process
+                                .cmd()
+                                .iter()
+                                .map(|s| s.to_string_lossy().to_string())
+                                .collect(),
                             exe_path: process.exe().map(|p| p.display().to_string()),
                             uid: process.user_id().map(|u| u.to_string()),
                             username: None,
@@ -175,13 +198,20 @@ impl SystemProvider for RealSystem {
                             bind_addrs,
                             health: health_status,
                             forked,
-                            env: process.environ().iter().map(|s| s.to_string_lossy().to_string()).collect(),
+                            env: process
+                                .environ()
+                                .iter()
+                                .map(|s| s.to_string_lossy().to_string())
+                                .collect(),
                         });
                     }
                 }
             }
         }
 
-        Err(SystemError::ProcessNotFound(format!("No process found on port {}", port)))
+        Err(SystemError::ProcessNotFound(format!(
+            "No process found on port {}",
+            port
+        )))
     }
 }

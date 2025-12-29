@@ -3,7 +3,7 @@ use std::fs;
 pub fn get_open_fds(pid: u32) -> Vec<u64> {
     let mut fds = Vec::new();
     let fd_dir = format!("/proc/{}/fd", pid);
-    
+
     if let Ok(entries) = fs::read_dir(&fd_dir) {
         for entry in entries.flatten() {
             if let Ok(name) = entry.file_name().into_string() {

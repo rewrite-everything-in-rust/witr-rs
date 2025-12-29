@@ -29,8 +29,14 @@ mod tests {
 
     #[test]
     fn test_parse_cgroup() {
-        assert_eq!(parse_cgroup("1:name=systemd:/docker/12345"), Some("docker".to_string()));
-        assert_eq!(parse_cgroup("1:name=systemd:/kubepods/123"), Some("kubernetes".to_string()));
+        assert_eq!(
+            parse_cgroup("1:name=systemd:/docker/12345"),
+            Some("docker".to_string())
+        );
+        assert_eq!(
+            parse_cgroup("1:name=systemd:/kubepods/123"),
+            Some("kubernetes".to_string())
+        );
         assert_eq!(parse_cgroup("1:name=systemd:/user.slice"), None);
     }
 }

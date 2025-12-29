@@ -1,11 +1,7 @@
 use std::process::Command;
 
 pub fn get_user_name(uid: u32) -> Option<String> {
-    if let Ok(output) = Command::new("id")
-        .arg("-un")
-        .arg(uid.to_string())
-        .output()
-    {
+    if let Ok(output) = Command::new("id").arg("-un").arg(uid.to_string()).output() {
         let output_str = String::from_utf8_lossy(&output.stdout);
         return parse_id_output(&output_str);
     }

@@ -47,8 +47,14 @@ mod tests {
 
     #[test]
     fn test_parse_git_head() {
-        assert_eq!(parse_git_head("ref: refs/heads/main"), Some("main".to_string()));
-        assert_eq!(parse_git_head("ref: refs/heads/feature/branch"), Some("branch".to_string()));
+        assert_eq!(
+            parse_git_head("ref: refs/heads/main"),
+            Some("main".to_string())
+        );
+        assert_eq!(
+            parse_git_head("ref: refs/heads/feature/branch"),
+            Some("branch".to_string())
+        );
         assert_eq!(parse_git_head("a1b2c3d4e5f6"), Some("a1b2c3d".to_string()));
     }
 }

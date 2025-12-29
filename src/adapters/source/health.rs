@@ -43,22 +43,34 @@ mod tests {
         // Mock params
         let mem = 0; // 0 MB
         let cpu = 0.0;
-        
+
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
-        
+
         let recent_start = now - 1000; // Started 1000s ago
 
-        assert_eq!(get_health_status(1, ProcessStatus::Zombie, mem, cpu, recent_start), "zombie");
-        assert_eq!(get_health_status(1, ProcessStatus::Stop, mem, cpu, recent_start), "stopped");
-        
+        assert_eq!(
+            get_health_status(1, ProcessStatus::Zombie, mem, cpu, recent_start),
+            "zombie"
+        );
+        assert_eq!(
+            get_health_status(1, ProcessStatus::Stop, mem, cpu, recent_start),
+            "stopped"
+        );
+
         // High CPU > 80.0
-        assert_eq!(get_health_status(1, ProcessStatus::Run, mem, 85.0, recent_start), "high-cpu");
-        
+        assert_eq!(
+            get_health_status(1, ProcessStatus::Run, mem, 85.0, recent_start),
+            "high-cpu"
+        );
+
         // Healthy
-        assert_eq!(get_health_status(1, ProcessStatus::Run, mem, 10.0, recent_start), "healthy");
+        assert_eq!(
+            get_health_status(1, ProcessStatus::Run, mem, 10.0, recent_start),
+            "healthy"
+        );
     }
 }
 

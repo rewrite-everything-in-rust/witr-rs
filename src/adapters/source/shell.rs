@@ -1,5 +1,8 @@
 pub fn is_shell_process(comm: &str) -> bool {
-    matches!(comm, "bash" | "sh" | "zsh" | "fish" | "csh" | "tcsh" | "ksh")
+    matches!(
+        comm,
+        "bash" | "sh" | "zsh" | "fish" | "csh" | "tcsh" | "ksh"
+    )
 }
 
 #[cfg(test)]

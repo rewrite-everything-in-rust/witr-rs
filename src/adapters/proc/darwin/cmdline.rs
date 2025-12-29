@@ -16,11 +16,8 @@ fn parse_ps_cmdline(output: &str) -> Vec<String> {
     if trimmed.is_empty() {
         return Vec::new();
     }
-    
-    trimmed
-        .split_whitespace()
-        .map(|s| s.to_string())
-        .collect()
+
+    trimmed.split_whitespace().map(|s| s.to_string()).collect()
 }
 
 #[cfg(test)]

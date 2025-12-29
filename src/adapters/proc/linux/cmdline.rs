@@ -30,7 +30,7 @@ mod tests {
         let content = b"prog\0arg1\0arg2\0";
         let args = parse_cmdline(content);
         assert_eq!(args, vec!["prog", "arg1", "arg2"]);
-        
+
         // No nulls or empty
         let empty = b"";
         assert!(parse_cmdline(empty).is_empty());

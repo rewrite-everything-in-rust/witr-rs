@@ -31,7 +31,10 @@ fn parse_resource_context(assertions: Option<&str>, thermlog: Option<&str>) -> O
     };
 
     if prevents_sleep || !thermal_state.is_empty() {
-        Some(format!("sleep={}, thermal={}", prevents_sleep, thermal_state))
+        Some(format!(
+            "sleep={}, thermal={}",
+            prevents_sleep, thermal_state
+        ))
     } else {
         None
     }
@@ -45,15 +48,15 @@ mod tests {
     fn test_parse_resource_context() {
         let assertions = "Some output... PreventUserIdleSystemSleep ...";
         let thermlog = "Normal";
-        
+
         // Both present
         let res = parse_resource_context(Some(assertions), Some(thermlog));
         assert_eq!(res, Some("sleep=true, thermal=Normal".to_string()));
-        
+
         // Sleep only
         let res2 = parse_resource_context(Some(assertions), None);
         assert_eq!(res2, Some("sleep=true, thermal=".to_string()));
-        
+
         // None
         let res3 = parse_resource_context(Some("nada"), Some(""));
         assert_eq!(res3, None); // thermal empty, sleep false

@@ -95,24 +95,22 @@ fn main() -> Result<()> {
         }
     } else if let Some(port) = args.port {
         match service.inspect_port(port) {
-            Ok(process) => {
-                match service.get_ancestry(process.pid) {
-                    Ok(chain) => {
-                        if args.short {
-                            output::short::print(&chain, &colors);
-                        } else if args.tree {
-                            output::tree::print(&chain, 0);
-                        } else if args.json {
-                            let _ = output::json::print(&process, &chain);
-                        } else if args.warnings {
-                            output::warnings::print(&chain);
-                        } else {
-                            output::standard::print(&process, &chain, &colors);
-                        }
+            Ok(process) => match service.get_ancestry(process.pid) {
+                Ok(chain) => {
+                    if args.short {
+                        output::short::print(&chain, &colors);
+                    } else if args.tree {
+                        output::tree::print(&chain, 0);
+                    } else if args.json {
+                        let _ = output::json::print(&process, &chain);
+                    } else if args.warnings {
+                        output::warnings::print(&chain);
+                    } else {
+                        output::standard::print(&process, &chain, &colors);
                     }
-                    Err(e) => eprintln!("Error: {}", e),
                 }
-            }
+                Err(e) => eprintln!("Error: {}", e),
+            },
             Err(e) => eprintln!("Error: {}", e),
         }
     } else {

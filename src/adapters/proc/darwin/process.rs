@@ -24,16 +24,17 @@ pub fn get_process_info(pid: u32) -> Option<ProcessInfo> {
 fn parse_ps_info(output: &str) -> Option<ProcessInfo> {
     let line = output.lines().next()?;
     let parts: Vec<&str> = line.split_whitespace().collect();
-    
-    if parts.len() < 7 { // PPID + UID + Day + Month + Date + Time + Year + Comm (min)
+
+    if parts.len() < 7 {
+        // PPID + UID + Day + Month + Date + Time + Year + Comm (min)
         return None;
     }
 
     let ppid = parts[0].parse::<u32>().ok()?;
     let uid = parts[1].parse::<u32>().ok()?;
-    
+
     let name = parts.last()?.to_string();
-    let start_time = 0; 
+    let start_time = 0;
 
     Some(ProcessInfo {
         ppid,
@@ -52,7 +53,7 @@ mod tests {
         // Mock output: PPID UID START... COMM
         let output = "  1   501 Mon Jan 16 10:00:00 2023 /sbin/launchd";
         let info = parse_ps_info(output).unwrap();
-        
+
         assert_eq!(info.ppid, 1);
         assert_eq!(info.uid, 501);
         assert_eq!(info.name, "/sbin/launchd");

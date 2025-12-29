@@ -8,8 +8,8 @@ fn parse_supervisor_conf(content: &str) -> Vec<String> {
     let mut programs = Vec::new();
     for line in content.lines() {
         if line.starts_with("[program:") {
-             let name = line.trim_start_matches("[program:").trim_end_matches(']');
-             programs.push(name.to_string());
+            let name = line.trim_start_matches("[program:").trim_end_matches(']');
+            programs.push(name.to_string());
         }
     }
     programs

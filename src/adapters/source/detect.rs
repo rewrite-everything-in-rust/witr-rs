@@ -1,6 +1,4 @@
-use crate::adapters::source::{
-    container, cron, git, network, service, shell, supervisor
-};
+use crate::adapters::source::{container, cron, git, network, service, shell, supervisor};
 
 #[derive(Debug, PartialEq)]
 pub enum SourceType {
@@ -35,7 +33,7 @@ pub fn detect_source(pid: u32, comm: &str, cwd: Option<&String>, port: Option<u1
     if cron::is_cron_process(pid) {
         return SourceType::Cron;
     }
-    
+
     if supervisor::is_supervisor_process(pid) {
         return SourceType::Supervisor;
     }
@@ -43,7 +41,7 @@ pub fn detect_source(pid: u32, comm: &str, cwd: Option<&String>, port: Option<u1
     if shell::is_shell_process(comm) {
         return SourceType::Shell;
     }
-    
+
     if let Some(p) = port {
         if network::is_network_service(p) {
             return SourceType::Network(p);
@@ -56,7 +54,7 @@ pub fn detect_source(pid: u32, comm: &str, cwd: Option<&String>, port: Option<u1
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_source_type_enum() {
         let s = SourceType::Container("docker".into());

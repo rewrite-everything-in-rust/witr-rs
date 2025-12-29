@@ -19,13 +19,12 @@ pub fn get_service_info(pid: u32) -> Option<String> {
     {
         // Simple Windows Stub for now (or implement similar to linux/mac split)
         let _ = pid;
-        None 
+        None
     }
-    
+
     #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
     {
-        let _ = pid; 
+        let _ = pid;
         None
     }
 }
-

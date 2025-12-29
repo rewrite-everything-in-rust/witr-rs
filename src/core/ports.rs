@@ -24,7 +24,7 @@ mod tests {
     fn test_error_display() {
         let err = SystemError::ProcessNotFound("123".into());
         assert_eq!(format!("{}", err), "Process not found: 123");
-        
+
         let err2 = SystemError::Unknown("fail".into());
         assert_eq!(format!("{}", err2), "System error: fail");
     }

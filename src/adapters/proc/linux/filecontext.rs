@@ -33,7 +33,8 @@ mod tests {
 
     #[test]
     fn test_parse_file_limit() {
-        let content = "Limit                     Soft Limit           Hard Limit           Units     
+        let content =
+            "Limit                     Soft Limit           Hard Limit           Units     
 Max cpu time              unlimited            unlimited            seconds   
 Max file size             unlimited            unlimited            bytes     
 Max data size             unlimited            unlimited            bytes     

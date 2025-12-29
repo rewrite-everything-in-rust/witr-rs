@@ -40,7 +40,10 @@ mod tests {
    Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
    Active: active (running) since Mon 2023-01-16 ...
 "#;
-        assert_eq!(parse_systemctl_status(output), Some("nginx.service".to_string()));
+        assert_eq!(
+            parse_systemctl_status(output),
+            Some("nginx.service".to_string())
+        );
 
         let invalid = "Loaded: loaded (/etc/init.d/apache2; generated)";
         assert_eq!(parse_systemctl_status(invalid), None);

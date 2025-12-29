@@ -1,5 +1,5 @@
-use std::process::Command;
 use std::collections::HashMap;
+use std::process::Command;
 
 pub fn get_socket_state(pid: u32) -> HashMap<u64, String> {
     if let Ok(output) = Command::new("lsof")
@@ -9,7 +9,7 @@ pub fn get_socket_state(pid: u32) -> HashMap<u64, String> {
         let output_str = String::from_utf8_lossy(&output.stdout);
         return parse_socket_states(&output_str);
     }
-    
+
     HashMap::new()
 }
 

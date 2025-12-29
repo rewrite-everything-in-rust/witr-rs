@@ -1,5 +1,5 @@
-use std::process::Command;
 use std::collections::HashMap;
+use std::process::Command;
 
 pub struct SocketInfo {
     pub port: u16,
@@ -14,7 +14,7 @@ pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
         let output_str = String::from_utf8_lossy(&output.stdout);
         return parse_listening_sockets(&output_str);
     }
-    
+
     HashMap::new()
 }
 
@@ -28,10 +28,13 @@ fn parse_listening_sockets(output_str: &str) -> HashMap<u64, SocketInfo> {
                 if let Some(addr_port) = parts.get(8) {
                     if let Some((addr, port_str)) = addr_port.rsplit_once(':') {
                         if let Ok(port) = port_str.parse::<u16>() {
-                            sockets.insert(fd, SocketInfo {
-                                port,
-                                local_addr: addr.to_string(),
-                            });
+                            sockets.insert(
+                                fd,
+                                SocketInfo {
+                                    port,
+                                    local_addr: addr.to_string(),
+                                },
+                            );
                         }
                     }
                 }
@@ -49,7 +52,7 @@ pub fn get_sockets_for_pid(pid: u32) -> Vec<u64> {
         let output_str = String::from_utf8_lossy(&output.stdout);
         return parse_pid_sockets(&output_str);
     }
-    
+
     Vec::new()
 }
 
@@ -78,9 +81,9 @@ controlle 666 user   10u  IPv4 0x1234567890abcdef      0t0  TCP 127.0.0.1:8080 (
 node      777 user   22u  IPv6 0xabcdef1234567890      0t0  TCP *:3000 (LISTEN)
 ";
         let sockets = parse_listening_sockets(output);
-        
+
         assert_eq!(sockets.len(), 2);
-        
+
         // Test fd 10
         let socket1 = sockets.get(&10).unwrap();
         assert_eq!(socket1.port, 8080);
