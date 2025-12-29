@@ -99,8 +99,7 @@ fn refresh_data(app: &mut App, service: &WitrService<RealSystem>) {
         */
 
         // Placeholder to indicate Global Mode is active but limited
-        app.title =
-            " Witr-RS Global Monitor (Detail Fetch Disabled - CPU Optimized) ".to_string();
+        app.title = " Witr-RS Global Monitor (Detail Fetch Disabled - CPU Optimized) ".to_string();
         app.set_data(procs); // Empty list for now
     }
 }
