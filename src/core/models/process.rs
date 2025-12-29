@@ -25,4 +25,8 @@ pub struct Process {
     pub health: String,
     pub forked: String,
     pub env: Vec<String>,
+    #[serde(default)]
+    pub cpu_usage: f32,
+    #[serde(default)]
+    pub memory_usage: u64,
 }

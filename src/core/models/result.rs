@@ -186,6 +186,8 @@ mod tests {
             health: "healthy".to_string(),
             forked: "forked".to_string(),
             env: vec![],
+            cpu_usage: 0.0,
+            memory_usage: 0,
         }
     }
 

@@ -2,18 +2,21 @@ use crate::adapters::proc as network;
 use crate::adapters::source;
 use crate::core::models::Process;
 use crate::core::ports::{SystemError, SystemProvider};
-use sysinfo::{Pid, System};
+use std::cell::RefCell;
+use sysinfo::{Pid, ProcessesToUpdate, System};
 
 #[derive(Default)]
 pub struct RealSystem {
-    sys: System,
+    sys: RefCell<System>,
 }
 
 impl RealSystem {
     pub fn new() -> Self {
         let mut sys = System::new_all();
         sys.refresh_all();
-        Self { sys }
+        Self {
+            sys: RefCell::new(sys),
+        }
     }
 
     fn get_network_info(&self, pid: u32) -> (Vec<u16>, Vec<String>, Vec<String>) {
@@ -45,8 +48,10 @@ impl RealSystem {
 impl SystemProvider for RealSystem {
     fn get_process_by_pid(&self, pid: u32) -> Result<Process, SystemError> {
         let sys_pid = Pid::from_u32(pid);
-        let process = self
-            .sys
+        let mut sys = self.sys.borrow_mut();
+        sys.refresh_processes(ProcessesToUpdate::Some(&[sys_pid]), true);
+
+        let process = sys
             .process(sys_pid)
             .ok_or_else(|| SystemError::ProcessNotFound(format!("PID {} not found", pid)))?;
 
@@ -107,14 +112,17 @@ impl SystemProvider for RealSystem {
                 .iter()
                 .map(|s| s.to_string_lossy().to_string())
                 .collect(),
+            cpu_usage: process.cpu_usage(),
+            memory_usage: process.memory(),
         })
     }
 
     fn find_processes_by_name(&self, name_query: &str) -> Result<Vec<Process>, SystemError> {
         let mut results = Vec::new();
         let name_lower = name_query.to_lowercase();
+        let sys = self.sys.borrow();
 
-        for (sys_pid, process) in self.sys.processes() {
+        for (sys_pid, process) in sys.processes() {
             let process_name = process.name().to_string_lossy().to_lowercase();
             if process_name.contains(&name_lower) {
                 let pid = sys_pid.as_u32();
@@ -175,6 +183,8 @@ impl SystemProvider for RealSystem {
                         .iter()
                         .map(|s| s.to_string_lossy().to_string())
                         .collect(),
+                    cpu_usage: process.cpu_usage(),
+                    memory_usage: process.memory(),
                 });
             }
         }
@@ -191,10 +201,11 @@ impl SystemProvider for RealSystem {
 
     fn find_process_by_port(&self, port: u16) -> Result<Process, SystemError> {
         let sockets = network::get_listening_sockets();
+        let sys = self.sys.borrow();
 
         for (fd, socket) in &sockets {
             if socket.port == port {
-                for (sys_pid, process) in self.sys.processes() {
+                for (sys_pid, process) in sys.processes() {
                     let pid = sys_pid.as_u32();
                     let fds = network::get_sockets_for_pid(pid);
 
@@ -256,6 +267,8 @@ impl SystemProvider for RealSystem {
                                 .iter()
                                 .map(|s| s.to_string_lossy().to_string())
                                 .collect(),
+                            cpu_usage: process.cpu_usage(),
+                            memory_usage: process.memory(),
                         });
                     }
                 }
@@ -271,6 +284,7 @@ impl SystemProvider for RealSystem {
     fn get_all_pids(&self) -> Result<Vec<u32>, SystemError> {
         Ok(self
             .sys
+            .borrow()
             .processes()
             .keys()
             .map(|pid| pid.as_u32())
