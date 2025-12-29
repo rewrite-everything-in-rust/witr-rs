@@ -17,8 +17,13 @@ pub fn get_service_info(pid: u32) -> Option<String> {
 
     #[cfg(target_os = "windows")]
     {
-        // Simple Windows Stub for now (or implement similar to linux/mac split)
-        let _ = pid;
+        use crate::adapters::source::windows::service;
+        if let Some(name) = service::get_service_name(pid) {
+            if let Some(start_type) = service::get_service_start_type(&name) {
+                return Some(format!("{} ({})", name, start_type));
+            }
+            return Some(name);
+        }
         None
     }
 
@@ -48,7 +53,14 @@ pub fn get_service_file(service_name: &str) -> Option<String> {
         systemd::get_fragment_path(service_name)
     }
 
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "windows")]
+    {
+        use crate::adapters::source::windows::service;
+        let clean_name = service_name.split(" (").next().unwrap_or(service_name);
+        service::get_service_binary_path(clean_name)
+    }
+
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
         let _ = service_name;
         None

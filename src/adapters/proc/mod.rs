@@ -14,8 +14,15 @@ pub use linux::net::{get_listening_sockets, get_sockets_for_pid, SocketInfo};
 #[cfg(target_os = "linux")]
 pub use linux::socketstate::get_socket_state;
 
-// For non-mac/linux platforms, provide stubs
-#[cfg(not(any(target_os = "macos", target_os = "linux")))]
+#[cfg(target_os = "windows")]
+pub mod windows;
+#[cfg(target_os = "windows")]
+pub use windows::net::get_socket_state;
+#[cfg(target_os = "windows")]
+pub use windows::net::{get_listening_sockets, get_sockets_for_pid, SocketInfo};
+
+// For non-mac/linux/windows platforms, provide stubs
+#[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
 pub mod stubs {
     use std::collections::HashMap;
 
@@ -37,5 +44,5 @@ pub mod stubs {
     }
 }
 
-#[cfg(not(any(target_os = "macos", target_os = "linux")))]
+#[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
 pub use stubs::*;

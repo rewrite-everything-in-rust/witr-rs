@@ -275,8 +275,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 
 ### Platform Improvements
 
-- [ ] Windows: Restore and improve WMI/Tasklist support
-- [ ] Windows: Detect service startup type (auto/manual/disabled)
+- [x] Windows: Restore and improve WMI/Tasklist support
+- [x] Windows: Detect service startup type (auto/manual/disabled)
 - [ ] macOS: Parse full plist for detailed trigger info
 
 ### Performance

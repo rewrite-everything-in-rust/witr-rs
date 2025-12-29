@@ -1,5 +1,7 @@
 pub mod darwin;
 pub mod linux;
+#[cfg(target_os = "windows")]
+pub mod windows;
 
 pub mod container;
 pub mod cron;
@@ -11,14 +13,11 @@ pub mod service;
 pub mod shell;
 pub mod supervisor;
 
-// Re-export platform modules
 #[cfg(target_os = "macos")]
 pub use darwin::*;
 
 #[cfg(target_os = "linux")]
 pub use linux::*;
-
-// Re-export shared modules
 pub use container::*;
 pub use cron::*;
 pub use detect::*;
