@@ -91,10 +91,59 @@ fn main() -> Result<()> {
     }
 
     if args.security_scan {
-        println!("Scanning all processes for security issues... (this may take a moment)");
-        match service.inspect_all() {
-            Ok(results) => output::security::print_report(&results, &colors),
-            Err(e) => eprintln!("Error: {}", e),
+        let targets = if let Some(pid) = args.pid {
+            match service.get_inspection(pid) {
+                Ok(r) => vec![r],
+                Err(e) => {
+                    eprintln!("Error inspecting PID {}: {}", pid, e);
+                    return Ok(());
+                }
+            }
+        } else if let Some(name) = &args.name {
+            match service.inspect_name(name) {
+                Ok(procs) => {
+                    let mut results = Vec::new();
+                    for p in procs {
+                        if let Ok(res) = service.get_inspection(p.pid) {
+                            results.push(res);
+                        }
+                    }
+                    results
+                }
+                Err(e) => {
+                    eprintln!("Error inspecting name {}: {}", name, e);
+                    return Ok(());
+                }
+            }
+        } else if let Some(port) = args.port {
+            match service.inspect_port(port) {
+                Ok(p) => match service.get_inspection(p.pid) {
+                    Ok(r) => vec![r],
+                    Err(e) => {
+                        eprintln!("Error getting inspection for PID {}: {}", p.pid, e);
+                        return Ok(());
+                    }
+                },
+                Err(e) => {
+                    eprintln!("Error inspecting port {}: {}", port, e);
+                    return Ok(());
+                }
+            }
+        } else {
+            println!("Scanning all processes for security issues... (this may take a moment)");
+            match service.inspect_all() {
+                Ok(results) => results,
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    return Ok(());
+                }
+            }
+        };
+
+        if !targets.is_empty() {
+            output::security::print_report(&targets, &colors);
+        } else {
+            println!("No targets found to scan.");
         }
         return Ok(());
     }

@@ -36,6 +36,7 @@
 - **Warnings** (`--warnings`) - Show only processes with issues
 - **Environment** (`--env`) - Display environment variables only
 - **Security Scan** (`--scan`) - System-wide security audit for malware and vulnerabilities
+- **Watch Mode** (`--watch`) - Live interactive process monitoring
 
 ### Display Features
 
@@ -116,8 +117,14 @@ witr-rs --pid 1234 --env
 # Disable colored output
 witr-rs explorer --no-color
 
-# Run security scan
+# Run security scan (System-wide)
 witr-rs --scan
+
+# Run security scan on specific process
+witr-rs explorer --scan
+
+# Live watch mode
+witr-rs --pid 1234 --watch
 ```
 
 ### Command-Line Options
@@ -137,6 +144,8 @@ OPTIONS:
     --json                Output as JSON
     --warnings            Show only warnings
     --env                 Show environment variables only
+    --security-scan       Run security vulnerability scan (alias: --scan, --sec)
+    --watch               Live watch mode
     --no-color            Disable colored output
     -h, --help            Print help
     -V, --version         Print version
@@ -166,47 +175,6 @@ OPTIONS:
 - Read-only operations
 - No destructive actions
 - May require elevated permissions for full functionality
-
-## License
-
-Apache 2.0 (same as original witr)
-
----
-
-## Testing
-
-```bash
-# Run all tests
-cargo test --all
-
-# Run with output
-cargo test --all -- --nocapture
-
-# Run only unit tests
-cargo test --lib
-
-# Run only integration tests
-cargo test --test integration_test
-```
-
-### Test Coverage
-
-- 47 unit tests (core business logic & adapters)
-- 5 integration tests (real system operations)
-- All tests passing on Windows, Linux, and macOS
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
-
-- Code style and conventions
-- Adding new features
-- Writing tests
-- Submitting pull requests
-
-## Project Status
-
-**Production Ready** - All core features implemented and tested.
 
 ### Completed Features
 
