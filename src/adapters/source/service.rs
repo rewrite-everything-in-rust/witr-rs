@@ -7,12 +7,12 @@ use crate::adapters::source::darwin::launchd;
 pub fn get_service_info(pid: u32) -> Option<String> {
     #[cfg(target_os = "linux")]
     {
-        return systemd::get_systemd_service(pid);
+        systemd::get_systemd_service(pid)
     }
 
     #[cfg(target_os = "macos")]
     {
-        return launchd::get_launchd_service(pid);
+        launchd::get_launchd_service(pid)
     }
 
     #[cfg(target_os = "windows")]
