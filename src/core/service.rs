@@ -70,7 +70,6 @@ impl<S: SystemProvider> WitrService<S> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
