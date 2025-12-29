@@ -5,10 +5,10 @@ use witr_rs::core::service::WitrService;
 fn test_inspect_self() {
     let sys = RealSystem::new();
     let service = WitrService::new(sys);
-    
+
     let current_pid = std::process::id();
     let result = service.inspect_pid(current_pid);
-    
+
     assert!(result.is_ok());
     let process = result.unwrap();
     assert_eq!(process.pid, current_pid);
@@ -19,10 +19,10 @@ fn test_inspect_self() {
 fn test_get_ancestry_of_self() {
     let sys = RealSystem::new();
     let service = WitrService::new(sys);
-    
+
     let current_pid = std::process::id();
     let result = service.get_ancestry(current_pid);
-    
+
     assert!(result.is_ok());
     let chain = result.unwrap();
     assert!(!chain.is_empty());
@@ -33,16 +33,16 @@ fn test_get_ancestry_of_self() {
 fn test_inspect_system_process() {
     let sys = RealSystem::new();
     let service = WitrService::new(sys);
-    
+
     #[cfg(target_os = "windows")]
     let system_pid = 4;
-    
+
     #[cfg(target_os = "linux")]
     let system_pid = 1;
-    
+
     #[cfg(target_os = "macos")]
     let system_pid = 1;
-    
+
     let result = service.inspect_pid(system_pid);
     assert!(result.is_ok());
 }
@@ -51,7 +51,7 @@ fn test_inspect_system_process() {
 fn test_inspect_nonexistent_process() {
     let sys = RealSystem::new();
     let service = WitrService::new(sys);
-    
+
     let result = service.inspect_pid(999999);
     assert!(result.is_err());
 }
@@ -60,12 +60,12 @@ fn test_inspect_nonexistent_process() {
 fn test_full_inspection_flow() {
     let sys = RealSystem::new();
     let service = WitrService::new(sys);
-    
+
     let current_pid = std::process::id();
-    
+
     let inspection = service.get_inspection(current_pid);
     assert!(inspection.is_ok());
-    
+
     let result = inspection.unwrap();
     assert_eq!(result.process.pid, current_pid);
     assert!(!result.ancestry.is_empty());

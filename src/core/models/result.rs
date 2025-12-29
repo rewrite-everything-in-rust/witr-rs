@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use super::{Process, Source, SourceType};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InspectionResult {
@@ -118,11 +118,24 @@ mod tests {
 
     fn mock_process(pid: u32, name: &str) -> Process {
         Process {
-            pid, parent_pid: Some(1), name: name.to_string(), cmd: vec![name.to_string()],
-            exe_path: Some(format!("/usr/bin/{}", name)), uid: Some("1000".to_string()),
-            username: Some("user".to_string()), start_time: 1000, cwd: Some("/home/user".to_string()),
-            git_repo: None, git_branch: None, container: None, service: None, ports: vec![],
-            bind_addrs: vec![], health: "healthy".to_string(), forked: "forked".to_string(), env: vec![],
+            pid,
+            parent_pid: Some(1),
+            name: name.to_string(),
+            cmd: vec![name.to_string()],
+            exe_path: Some(format!("/usr/bin/{}", name)),
+            uid: Some("1000".to_string()),
+            username: Some("user".to_string()),
+            start_time: 1000,
+            cwd: Some("/home/user".to_string()),
+            git_repo: None,
+            git_branch: None,
+            container: None,
+            service: None,
+            ports: vec![],
+            bind_addrs: vec![],
+            health: "healthy".to_string(),
+            forked: "forked".to_string(),
+            env: vec![],
         }
     }
 

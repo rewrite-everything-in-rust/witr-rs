@@ -5,13 +5,16 @@ use std::fs;
 pub fn get_open_fds(pid: u32) -> Vec<u64> {
     let fd_dir = format!("/proc/{}/fd", pid);
     let mut inodes = Vec::new();
-    
+
     if let Ok(entries) = fs::read_dir(&fd_dir) {
         for entry in entries.flatten() {
             if let Ok(link) = fs::read_link(entry.path()) {
                 let link_str = link.to_string_lossy();
                 if link_str.starts_with("socket:[") {
-                    if let Some(inode_str) = link_str.strip_prefix("socket:[").and_then(|s| s.strip_suffix(']')) {
+                    if let Some(inode_str) = link_str
+                        .strip_prefix("socket:[")
+                        .and_then(|s| s.strip_suffix(']'))
+                    {
                         if let Ok(inode) = inode_str.parse::<u64>() {
                             inodes.push(inode);
                         }
@@ -20,16 +23,16 @@ pub fn get_open_fds(pid: u32) -> Vec<u64> {
             }
         }
     }
-    
+
     inodes
 }
 
 #[cfg(target_os = "macos")]
 pub fn get_open_fds(pid: u32) -> Vec<u64> {
     use std::process::Command;
-    
+
     let mut inodes = Vec::new();
-    
+
     if let Ok(output) = Command::new("lsof")
         .args(["-p", &pid.to_string(), "-nP", "-F", "n"])
         .output()
@@ -45,7 +48,7 @@ pub fn get_open_fds(pid: u32) -> Vec<u64> {
             }
         }
     }
-    
+
     inodes
 }
 

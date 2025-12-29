@@ -20,7 +20,7 @@ Thank you for your interest in contributing to witr-rs! This document provides g
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/witr-rs.git
+git clone https://github.com/rewrite-everything-in-rust/witr-rs.git
 cd witr-rs
 
 # Build the project

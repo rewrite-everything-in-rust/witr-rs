@@ -41,7 +41,7 @@
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/witr-rs.git
+git clone https://github.com/rewrite-everything-in-rust/witr-rs.git
 cd witr-rs
 cargo install --path .
 ```

@@ -3,12 +3,12 @@ use crate::core::models::FileContext;
 #[cfg(target_os = "linux")]
 pub fn get_file_context(pid: u32) -> Option<FileContext> {
     use std::fs;
-    
+
     let open_files = super::fd::count_open_files(pid);
-    
+
     let limit_path = format!("/proc/{}/limits", pid);
     let mut file_limit = 0;
-    
+
     if let Ok(content) = fs::read_to_string(&limit_path) {
         for line in content.lines() {
             if line.contains("Max open files") {
@@ -22,9 +22,9 @@ pub fn get_file_context(pid: u32) -> Option<FileContext> {
             }
         }
     }
-    
+
     let locked_files = get_locked_files_linux(pid);
-    
+
     Some(FileContext {
         open_files,
         file_limit,
@@ -36,9 +36,9 @@ pub fn get_file_context(pid: u32) -> Option<FileContext> {
 #[cfg(target_os = "linux")]
 fn get_locked_files_linux(pid: u32) -> Vec<String> {
     use std::fs;
-    
+
     let mut locked = Vec::new();
-    
+
     if let Ok(content) = fs::read_to_string("/proc/locks") {
         let pid_str = pid.to_string();
         for line in content.lines() {
@@ -50,17 +50,17 @@ fn get_locked_files_linux(pid: u32) -> Vec<String> {
             }
         }
     }
-    
+
     locked
 }
 
 #[cfg(target_os = "macos")]
 pub fn get_file_context(pid: u32) -> Option<FileContext> {
     use std::process::Command;
-    
+
     let mut open_files = 0;
     let mut locked_files = Vec::new();
-    
+
     if let Ok(output) = Command::new("lsof")
         .args(["-p", &pid.to_string(), "-F", "n"])
         .output()
@@ -75,7 +75,7 @@ pub fn get_file_context(pid: u32) -> Option<FileContext> {
             }
         }
     }
-    
+
     Some(FileContext {
         open_files,
         file_limit: 0,

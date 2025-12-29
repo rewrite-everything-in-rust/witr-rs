@@ -17,16 +17,13 @@ pub fn get_cmdline(pid: u32) -> Vec<String> {
 #[cfg(target_os = "macos")]
 pub fn get_cmdline(pid: u32) -> Vec<String> {
     use std::process::Command;
-    
+
     if let Ok(output) = Command::new("ps")
         .args(["-p", &pid.to_string(), "-o", "command="])
         .output()
     {
         let cmd_str = String::from_utf8_lossy(&output.stdout);
-        return cmd_str
-            .split_whitespace()
-            .map(|s| s.to_string())
-            .collect();
+        return cmd_str.split_whitespace().map(|s| s.to_string()).collect();
     }
     Vec::new()
 }
