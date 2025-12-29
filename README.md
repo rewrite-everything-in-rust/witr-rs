@@ -1,8 +1,15 @@
 # witr-rs
 
+[![CI](https://img.shields.io/github/actions/workflow/status/rewrite-everything-in-rust/witr-rs/ci.yml?label=CI&logo=github)](https://github.com/rewrite-everything-in-rust/witr-rs/actions)
+[![Release](https://img.shields.io/github/v/release/rewrite-everything-in-rust/witr-rs?label=Latest%20Version&logo=rust)](https://github.com/rewrite-everything-in-rust/witr-rs/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-lightgrey)](https://github.com/rewrite-everything-in-rust/witr-rs)
+[![License](https://img.shields.io/github/license/rewrite-everything-in-rust/witr-rs)](LICENSE)
+
 **A Rust rewrite of [witr (why-is-this-running)](https://github.com/pranshuparmar/witr)**
 
 `witr-rs` is a cross-platform command-line tool that explains why processes are running on your system by tracing their ancestry and analyzing their context.
+
+![witr-rs demo](image/screenshot.png)
 
 **Attribution:** This project is a complete Rust rewrite of the original [witr](https://github.com/pranshuparmar/witr) tool by [@pranshuparmar](https://github.com/pranshuparmar). The original project is licensed under Apache-2.0. This rewrite maintains feature parity while adding improved type safety, cross-platform support, and comprehensive testing. See [LICENSE](LICENSE) for details.
 
@@ -37,6 +44,19 @@
 - Optional no-color mode (`--no-color`) for scripting
 
 ## Installation
+
+### Pre-built Binaries (Recommended)
+
+Download the latest binary for your OS directly. These links always point to the latest release version.
+
+| Platform    | Arch            | Download Link                                                                                                                 |
+| ----------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Linux**   | `amd64`         | [**Download**](https://github.com/rewrite-everything-in-rust/witr-rs/releases/latest/download/witr-rs-linux-amd64)            |
+| **macOS**   | `Intel`         | [**Download**](https://github.com/rewrite-everything-in-rust/witr-rs/releases/latest/download/witr-rs-macos-amd64)            |
+| **macOS**   | `Apple Silicon` | [**Download**](https://github.com/rewrite-everything-in-rust/witr-rs/releases/latest/download/witr-rs-macos-arm64)            |
+| **Windows** | `amd64`         | [**Download .exe**](https://github.com/rewrite-everything-in-rust/witr-rs/releases/latest/download/witr-rs-windows-amd64.exe) |
+
+> **Note:** On Linux/macOS, don't forget to make it executable: `chmod +x witr-rs-*`
 
 ### From Source
 
