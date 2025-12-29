@@ -1,8 +1,6 @@
-pub mod boot;
-pub mod cmdline;
-pub mod fd;
-pub mod filecontext;
-pub mod resource;
-pub mod socketstate;
+pub mod network;
+pub mod proc;
+pub mod source;
 pub mod system;
-pub mod user;
+
+pub use system::RealSystem;

@@ -159,7 +159,7 @@ cargo test --test integration_test
 
 ### Test Coverage
 
-- 13 unit tests (core business logic)
+- 47 unit tests (core business logic & adapters)
 - 5 integration tests (real system operations)
 - All tests passing on Windows, Linux, and macOS
 
@@ -196,19 +196,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 
 ### Resource Detection (macOS)
 
-- [ ] Implement ResourceContext detection via pmset commands
-- [ ] Query energy impact, sleep prevention, thermal state, App Nap status
+- [x] Implement ResourceContext detection via pmset commands
+- [ ] Query energy impact, sleep prevention, thermal state, App Nap status (Partial)
 
 ### File Context Detection
 
-- [ ] Count open file descriptors (Linux: /proc/{pid}/fd, macOS: lsof -p)
-- [ ] Get file descriptor limits (Linux: /proc/{pid}/limits, macOS: ulimit)
+- [x] Count open file descriptors (Linux: /proc/{pid}/fd, macOS: lsof -p)
+- [x] Get file descriptor limits (Linux: /proc/{pid}/limits, macOS: ulimit)
 - [ ] Detect locked files (Linux: /proc/locks, macOS: lsof -F)
 - [ ] Detect watched directories (inotify/fsevents)
 
 ### Socket Info Enhancement
 
-- [ ] Detect socket state (LISTEN/ESTABLISHED/TIME_WAIT/CLOSE_WAIT)
+- [x] Detect socket state (macOS: lsof -i)
+- [x] Detect socket state (Linux: /proc/net/tcp)
 - [ ] Add human-readable state explanations
 - [ ] Suggest workarounds for common issues (TIME_WAIT ports, etc)
 
@@ -234,10 +235,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 
 ### Platform Improvements
 
-- [ ] Windows: Use WMI queries for richer service info
+- [ ] Windows: Restore and improve WMI/Tasklist support (currently minimal)
 - [ ] Windows: Detect service startup type (auto/manual/disabled)
 - [ ] macOS: Parse full plist for detailed trigger info
-- [ ] macOS: Show RunAtLoad, KeepAlive, WatchPaths directives
 
 ### Performance
 

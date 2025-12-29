@@ -22,7 +22,7 @@ pub fn format_duration(start_time: u64) -> (String, String) {
     let datetime: DateTime<Utc> = Utc
         .timestamp_opt(start_time as i64, 0)
         .single()
-        .unwrap_or_else(|| Utc::now());
+        .unwrap_or_else(Utc::now);
 
     let formatted = datetime.format("%a %Y-%m-%d %H:%M:%S %z").to_string();
 

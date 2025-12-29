@@ -15,3 +15,17 @@ pub trait SystemProvider {
     fn find_processes_by_name(&self, name: &str) -> Result<Vec<Process>, SystemError>;
     fn find_process_by_port(&self, port: u16) -> Result<Process, SystemError>;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_display() {
+        let err = SystemError::ProcessNotFound("123".into());
+        assert_eq!(format!("{}", err), "Process not found: 123");
+        
+        let err2 = SystemError::Unknown("fail".into());
+        assert_eq!(format!("{}", err2), "System error: fail");
+    }
+}
