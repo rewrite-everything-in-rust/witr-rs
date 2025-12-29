@@ -2,10 +2,14 @@ use std::collections::HashMap;
 use std::fs;
 
 pub fn get_socket_state(_pid: u32) -> HashMap<u64, String> {
+    let mut states = HashMap::new();
     if let Ok(content) = fs::read_to_string("/proc/net/tcp") {
-        return parse_tcp_states(&content);
+        states.extend(parse_tcp_states(&content));
     }
-    HashMap::new()
+    if let Ok(content) = fs::read_to_string("/proc/net/tcp6") {
+        states.extend(parse_tcp_states(&content));
+    }
+    states
 }
 
 fn parse_tcp_states(content: &str) -> HashMap<u64, String> {

@@ -16,21 +16,29 @@ impl RealSystem {
         Self { sys }
     }
 
-    fn get_network_info(&self, pid: u32) -> (Vec<u16>, Vec<String>) {
+    fn get_network_info(&self, pid: u32) -> (Vec<u16>, Vec<String>, Vec<String>) {
         let mut ports = Vec::new();
         let mut addrs = Vec::new();
+        let mut states = Vec::new();
 
         let sockets = network::get_listening_sockets();
         let fds = network::get_sockets_for_pid(pid);
+        let socket_states = network::get_socket_state(pid);
 
         for fd in fds {
             if let Some(socket) = sockets.get(&fd) {
                 ports.push(socket.port);
                 addrs.push(socket.local_addr.clone());
+                states.push(
+                    socket_states
+                        .get(&fd)
+                        .cloned()
+                        .unwrap_or_else(|| "UNKNOWN".to_string()),
+                );
             }
         }
 
-        (ports, addrs)
+        (ports, addrs, states)
     }
 }
 
@@ -43,7 +51,7 @@ impl SystemProvider for RealSystem {
             .ok_or_else(|| SystemError::ProcessNotFound(format!("PID {} not found", pid)))?;
 
         let parent_pid = process.parent().map(|p| p.as_u32());
-        let (ports, bind_addrs) = self.get_network_info(pid);
+        let (ports, bind_addrs, port_states) = self.get_network_info(pid);
         let cwd_string = process.cwd().map(|p| p.display().to_string());
         let (git_repo, git_branch) = source::get_git_info(cwd_string.as_ref());
         let service_name = source::get_service_info(pid);
@@ -56,6 +64,16 @@ impl SystemProvider for RealSystem {
             process.start_time(),
         );
         let forked = source::detect_forked(parent_pid);
+
+        let mut final_restart_count = service_name
+            .as_ref()
+            .and_then(|s| source::get_service_restart_count(s));
+
+        if final_restart_count.is_none() && container.as_deref() == Some("docker") {
+            if let Some(id) = source::get_container_id(pid) {
+                final_restart_count = source::get_docker_restart_count(&id);
+            }
+        }
 
         Ok(Process {
             pid,
@@ -74,9 +92,14 @@ impl SystemProvider for RealSystem {
             git_repo,
             git_branch,
             container,
-            service: service_name,
+            service: service_name.clone(),
             ports,
             bind_addrs,
+            port_states,
+            restart_count: final_restart_count,
+            service_file: service_name
+                .as_ref()
+                .and_then(|s| source::get_service_file(s)),
             health: health_status,
             forked,
             env: process
@@ -96,7 +119,7 @@ impl SystemProvider for RealSystem {
             if process_name.contains(&name_lower) {
                 let pid = sys_pid.as_u32();
                 let parent_pid = process.parent().map(|p| p.as_u32());
-                let (ports, bind_addrs) = self.get_network_info(pid);
+                let (ports, bind_addrs, port_states) = self.get_network_info(pid);
                 let cwd_string = process.cwd().map(|p| p.display().to_string());
                 let (git_repo, git_branch) = source::get_git_info(cwd_string.as_ref());
                 let service_name = source::get_service_info(pid);
@@ -109,6 +132,16 @@ impl SystemProvider for RealSystem {
                     process.start_time(),
                 );
                 let forked = source::detect_forked(parent_pid);
+
+                let mut final_restart_count = service_name
+                    .as_ref()
+                    .and_then(|s| source::get_service_restart_count(s));
+
+                if final_restart_count.is_none() && container.as_deref() == Some("docker") {
+                    if let Some(id) = source::get_container_id(pid) {
+                        final_restart_count = source::get_docker_restart_count(&id);
+                    }
+                }
 
                 results.push(Process {
                     pid,
@@ -127,9 +160,14 @@ impl SystemProvider for RealSystem {
                     git_repo,
                     git_branch,
                     container,
-                    service: service_name,
+                    service: service_name.clone(),
                     ports,
                     bind_addrs,
+                    port_states,
+                    restart_count: final_restart_count,
+                    service_file: service_name
+                        .as_ref()
+                        .and_then(|s| source::get_service_file(s)),
                     health: health_status,
                     forked,
                     env: process
@@ -162,7 +200,7 @@ impl SystemProvider for RealSystem {
 
                     if fds.contains(fd) {
                         let parent_pid = process.parent().map(|p| p.as_u32());
-                        let (ports, bind_addrs) = self.get_network_info(pid);
+                        let (ports, bind_addrs, port_states) = self.get_network_info(pid);
                         let cwd_string = process.cwd().map(|p| p.display().to_string());
                         let (git_repo, git_branch) = source::get_git_info(cwd_string.as_ref());
                         let service_name = source::get_service_info(pid);
@@ -175,6 +213,16 @@ impl SystemProvider for RealSystem {
                             process.start_time(),
                         );
                         let forked = source::detect_forked(parent_pid);
+
+                        let mut final_restart_count = service_name
+                            .as_ref()
+                            .and_then(|s| source::get_service_restart_count(s));
+
+                        if final_restart_count.is_none() && container.as_deref() == Some("docker") {
+                            if let Some(id) = source::get_container_id(pid) {
+                                final_restart_count = source::get_docker_restart_count(&id);
+                            }
+                        }
 
                         return Ok(Process {
                             pid,
@@ -193,9 +241,14 @@ impl SystemProvider for RealSystem {
                             git_repo,
                             git_branch,
                             container,
-                            service: service_name,
+                            service: service_name.clone(),
                             ports,
                             bind_addrs,
+                            port_states,
+                            restart_count: final_restart_count,
+                            service_file: service_name
+                                .as_ref()
+                                .and_then(|s| source::get_service_file(s)),
                             health: health_status,
                             forked,
                             env: process
@@ -213,5 +266,14 @@ impl SystemProvider for RealSystem {
             "No process found on port {}",
             port
         )))
+    }
+
+    fn get_all_pids(&self) -> Result<Vec<u32>, SystemError> {
+        Ok(self
+            .sys
+            .processes()
+            .keys()
+            .map(|pid| pid.as_u32())
+            .collect())
     }
 }

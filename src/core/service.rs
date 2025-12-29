@@ -23,6 +23,19 @@ impl<S: SystemProvider> WitrService<S> {
         self.sys.find_process_by_port(port)
     }
 
+    pub fn inspect_all(&self) -> Result<Vec<crate::core::models::InspectionResult>, SystemError> {
+        let pids = self.sys.get_all_pids()?;
+        let mut results = Vec::new();
+        for pid in pids {
+            if let Ok(res) = self.get_inspection(pid) {
+                if !res.warnings.is_empty() {
+                    results.push(res);
+                }
+            }
+        }
+        Ok(results)
+    }
+
     pub fn get_inspection(
         &self,
         pid: u32,
@@ -56,6 +69,8 @@ impl<S: SystemProvider> WitrService<S> {
         Ok(crate::core::ancestry::build_ancestry_tree(chain))
     }
 }
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -82,8 +97,11 @@ mod tests {
                     git_branch: None,
                     container: None,
                     service: None,
+                    service_file: None,
                     ports: vec![],
                     bind_addrs: vec![],
+                    port_states: vec![],
+                    restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
@@ -118,8 +136,11 @@ mod tests {
                     git_branch: None,
                     container: None,
                     service: None,
+                    service_file: None,
                     ports: vec![],
                     bind_addrs: vec![],
+                    port_states: vec![],
+                    restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
@@ -143,8 +164,11 @@ mod tests {
                     git_branch: None,
                     container: None,
                     service: None,
+                    service_file: None,
                     ports: vec![],
                     bind_addrs: vec![],
+                    port_states: vec![],
+                    restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
@@ -168,8 +192,11 @@ mod tests {
                     git_branch: None,
                     container: None,
                     service: None,
+                    service_file: None,
                     ports: vec![],
                     bind_addrs: vec![],
+                    port_states: vec![],
+                    restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],

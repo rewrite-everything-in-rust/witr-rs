@@ -28,3 +28,29 @@ pub fn get_service_info(pid: u32) -> Option<String> {
         None
     }
 }
+
+pub fn get_service_restart_count(service_name: &str) -> Option<u32> {
+    #[cfg(target_os = "linux")]
+    {
+        systemd::get_restart_count(service_name)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = service_name;
+        None
+    }
+}
+
+pub fn get_service_file(service_name: &str) -> Option<String> {
+    #[cfg(target_os = "linux")]
+    {
+        systemd::get_fragment_path(service_name)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = service_name;
+        None
+    }
+}

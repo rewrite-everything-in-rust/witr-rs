@@ -35,6 +35,7 @@
 - **JSON** (`--json`) - Machine-readable JSON output
 - **Warnings** (`--warnings`) - Show only processes with issues
 - **Environment** (`--env`) - Display environment variables only
+- **Security Scan** (`--scan`) - System-wide security audit for malware and vulnerabilities
 
 ### Display Features
 
@@ -114,6 +115,9 @@ witr-rs --pid 1234 --env
 
 # Disable colored output
 witr-rs explorer --no-color
+
+# Run security scan
+witr-rs --scan
 ```
 
 ### Command-Line Options
@@ -219,6 +223,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 - [x] Colored output with `--no-color` flag
 - [x] Human-readable time formatting
 - [x] Comprehensive testing
+- [x] Security Scanning (Reverse Shell, Malware, Suspicious Dirs)
+- [x] Systemd Unit File detection
+- [x] Docker Restart Count detection
 
 ## TODO
 
@@ -243,27 +250,32 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 
 ### Restart Count Detection
 
-- [ ] For systemd: parse systemctl show {service} for NRestarts
+- [x] For systemd: parse systemctl show {service} for NRestarts
 - [ ] For launchd: check crash logs in ~/Library/Logs
-- [ ] For docker: use docker API to get restart count
+- [x] For docker: use docker inspect to get restart count
 - [ ] For pm2: parse pm2 jlist output
 
 ### Source Details
 
-- [ ] For systemd: show unit file path, triggers, dependencies
+- [x] For systemd: show unit file path
+- [ ] For systemd: show triggers, dependencies
 - [ ] For launchd: show plist path, program arguments, keep alive settings
-- [ ] For docker: show image name, container ID, docker-compose service
+- [x] For docker: show image name, container ID
+- [ ] For docker: docker-compose service
 
-### Enhanced Warning System
+### Enhanced Warning System (Security Scan)
 
-- [ ] Detect processes with weak permissions
+- [x] Detect processes with weak permissions (Run as root)
+- [x] Detect suspicious directories (/tmp, /dev/shm)
+- [x] Detect deleted binaries (Fileless execution)
+- [x] Detect unusual parent process (Reverse Shell)
 - [ ] Warn about excessive network connections
 - [ ] Warn about high file descriptor usage
 - [ ] Detect long-term zombie processes
 
 ### Platform Improvements
 
-- [ ] Windows: Restore and improve WMI/Tasklist support (currently minimal)
+- [ ] Windows: Restore and improve WMI/Tasklist support
 - [ ] Windows: Detect service startup type (auto/manual/disabled)
 - [ ] macOS: Parse full plist for detailed trigger info
 
@@ -276,7 +288,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 ### Additional Features
 
 - [ ] Process tree visualization (ASCII art like pstree)
-- [ ] Watch mode for continuous monitoring
+- [ ] Watch mode (`--watch`) for continuous monitoring
 - [ ] HTML export with styled output
 - [ ] CSV export for scripting
 

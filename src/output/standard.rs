@@ -30,7 +30,16 @@ pub fn print(target: &Process, chain: &[Process], colors: &ColorScheme) {
     }
 
     if let Some(service) = &target.service {
-        println!("{}     : {}", colors.metadata("Service"), service);
+        print!("{}     : {}", colors.metadata("Service"), service);
+        if let Some(restarts) = target.restart_count {
+            if restarts > 0 {
+                print!(" {}", colors.warning(&format!("(Restarts: {})", restarts)));
+            }
+        }
+        println!();
+        if let Some(path) = &target.service_file {
+            println!("{}   : {}", colors.metadata("Unit File"), path);
+        }
     }
 
     if !target.cmd.is_empty() {
@@ -89,10 +98,28 @@ pub fn print(target: &Process, chain: &[Process], colors: &ColorScheme) {
     }
     if !target.ports.is_empty() {
         for (i, (port, addr)) in target.ports.iter().zip(&target.bind_addrs).enumerate() {
-            if i == 0 {
-                println!("{}   : {}:{}", colors.command("Listening"), addr, port);
+            let state = target
+                .port_states
+                .get(i)
+                .map(|s| s.as_str())
+                .unwrap_or("UNKNOWN");
+
+            let state_info = if state == "UNKNOWN" {
+                String::new()
             } else {
-                println!("              {}:{}", addr, port);
+                format!(" ({})", state)
+            };
+
+            if i == 0 {
+                println!(
+                    "{}   : {}:{}{}",
+                    colors.command("Listening"),
+                    addr,
+                    port,
+                    state_info
+                );
+            } else {
+                println!("              {}:{}{}", addr, port, state_info);
             }
         }
     }

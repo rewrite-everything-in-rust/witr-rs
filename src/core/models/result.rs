@@ -13,7 +13,7 @@ pub struct InspectionResult {
 impl InspectionResult {
     pub fn new(process: Process, ancestry: Vec<Process>) -> Self {
         let source = Self::detect_source(&process, &ancestry);
-        let warnings = Self::generate_warnings(&process);
+        let warnings = Self::generate_warnings(&process, &ancestry);
         let restart_count = 0;
 
         Self {
@@ -82,7 +82,7 @@ impl InspectionResult {
         }
     }
 
-    fn generate_warnings(process: &Process) -> Vec<String> {
+    fn generate_warnings(process: &Process, ancestry: &[Process]) -> Vec<String> {
         let mut warnings = Vec::new();
 
         if process.health != "healthy" {
@@ -99,6 +99,22 @@ impl InspectionResult {
             }
         }
 
+        if let Some(exe) = &process.exe_path {
+            if exe.contains("(deleted)") {
+                warnings.push(format!(
+                    "BINARY DELETED: Executable file has been deleted ({})",
+                    exe
+                ));
+            }
+            if exe.starts_with("/tmp") || exe.starts_with("/var/tmp") || exe.starts_with("/dev/shm")
+            {
+                warnings.push(format!(
+                    "SUSPICIOUS LOCATION: Running from temporary directory ({})",
+                    exe
+                ));
+            }
+        }
+
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
@@ -106,6 +122,37 @@ impl InspectionResult {
 
         if now.saturating_sub(process.start_time) > 90 * 24 * 3600 {
             warnings.push("Process has been running for over 90 days".to_string());
+        }
+
+        // Reverse Shell Detection
+        let shell_names = [
+            "sh",
+            "bash",
+            "zsh",
+            "dash",
+            "ash",
+            "csh",
+            "ksh",
+            "powershell",
+            "pwsh",
+            "cmd",
+            "cmd.exe",
+        ];
+        let is_shell = shell_names.contains(&process.name.as_str())
+            || (process.name.len() < 5 && process.name.ends_with("sh"));
+
+        if is_shell && ancestry.len() >= 2 {
+            let parent = &ancestry[1];
+            let web_servers = [
+                "nginx", "httpd", "apache", "node", "php", "gunicorn", "uwsgi", "tomcat", "java",
+            ];
+
+            if web_servers.iter().any(|s| parent.name.contains(s)) {
+                warnings.push(format!(
+                    "POTENTIAL REVERSE SHELL: Shell spawned by web server process '{}'",
+                    parent.name
+                ));
+            }
         }
 
         warnings
@@ -131,8 +178,11 @@ mod tests {
             git_branch: None,
             container: None,
             service: None,
+            service_file: None,
             ports: vec![],
             bind_addrs: vec![],
+            port_states: vec![],
+            restart_count: None,
             health: "healthy".to_string(),
             forked: "forked".to_string(),
             env: vec![],
@@ -174,5 +224,38 @@ mod tests {
         let ancestry = vec![process.clone()];
         let result = InspectionResult::new(process, ancestry);
         assert!(result.warnings.iter().any(|w| w.contains("public")));
+    }
+
+    #[test]
+    fn test_warnings_deleted_binary() {
+        let mut process = mock_process(100, "malware");
+        process.exe_path = Some("/usr/bin/malware (deleted)".to_string());
+        let ancestry = vec![process.clone()];
+        let result = InspectionResult::new(process, ancestry);
+        assert!(result.warnings.iter().any(|w| w.contains("BINARY DELETED")));
+    }
+
+    #[test]
+    fn test_warnings_suspicious_location() {
+        let mut process = mock_process(100, "miner");
+        process.exe_path = Some("/tmp/.X11-unix/miner".to_string());
+        let ancestry = vec![process.clone()];
+        let result = InspectionResult::new(process, ancestry);
+        assert!(result
+            .warnings
+            .iter()
+            .any(|w| w.contains("SUSPICIOUS LOCATION")));
+    }
+
+    #[test]
+    fn test_warnings_reverse_shell() {
+        let parent = mock_process(50, "nginx");
+        let mut child = mock_process(100, "bash");
+        child.parent_pid = Some(50);
+
+        // Ancestry: [child, parent]
+        let ancestry = vec![child.clone(), parent];
+        let result = InspectionResult::new(child, ancestry);
+        assert!(result.warnings.iter().any(|w| w.contains("REVERSE SHELL")));
     }
 }

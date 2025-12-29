@@ -56,6 +56,22 @@ impl ColorScheme {
             text.to_string()
         }
     }
+
+    pub fn success(&self, text: &str) -> String {
+        if self.enabled {
+            text.green().bold().to_string()
+        } else {
+            text.to_string()
+        }
+    }
+
+    pub fn highlight(&self, text: &str) -> String {
+        if self.enabled {
+            text.white().bold().to_string()
+        } else {
+            text.to_string()
+        }
+    }
 }
 
 #[cfg(test)]

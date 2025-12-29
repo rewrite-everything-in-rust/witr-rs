@@ -15,8 +15,13 @@ pub struct Process {
     pub git_branch: Option<String>,
     pub container: Option<String>,
     pub service: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub service_file: Option<String>,
     pub ports: Vec<u16>,
     pub bind_addrs: Vec<String>,
+    #[serde(default)]
+    pub port_states: Vec<String>,
+    pub restart_count: Option<u32>,
     pub health: String,
     pub forked: String,
     pub env: Vec<String>,

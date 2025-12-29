@@ -33,6 +33,9 @@ struct Args {
 
     #[arg(long)]
     env: bool,
+
+    #[arg(long, aliases = ["sec", "scan"])]
+    security_scan: bool,
 }
 
 fn main() -> Result<()> {
@@ -48,6 +51,15 @@ fn main() -> Result<()> {
                 Ok(process) => output::envonly::print(&process),
                 Err(e) => eprintln!("Error: {}", e),
             }
+        }
+        return Ok(());
+    }
+
+    if args.security_scan {
+        println!("Scanning all processes for security issues... (this may take a moment)");
+        match service.inspect_all() {
+            Ok(results) => output::security::print_report(&results, &colors),
+            Err(e) => eprintln!("Error: {}", e),
         }
         return Ok(());
     }
@@ -79,16 +91,20 @@ fn main() -> Result<()> {
     } else if let Some(pid) = args.pid {
         match service.get_ancestry(pid) {
             Ok(chain) => {
-                if args.short {
-                    output::short::print(&chain, &colors);
-                } else if args.tree {
-                    output::tree::print(&chain, 0);
-                } else if args.json {
-                    let _ = output::json::print(chain.last().unwrap(), &chain);
-                } else if args.warnings {
-                    output::warnings::print(&chain);
+                if let Some(target) = chain.last() {
+                    if args.short {
+                        output::short::print(&chain, &colors);
+                    } else if args.tree {
+                        output::tree::print(&chain, 0);
+                    } else if args.json {
+                        let _ = output::json::print(target, &chain);
+                    } else if args.warnings {
+                        output::warnings::print(&chain);
+                    } else {
+                        output::standard::print(target, &chain, &colors);
+                    }
                 } else {
-                    output::standard::print(chain.last().unwrap(), &chain, &colors);
+                    eprintln!("Error: Process {} not found", pid);
                 }
             }
             Err(e) => eprintln!("Error: {}", e),

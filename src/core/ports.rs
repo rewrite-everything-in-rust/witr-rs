@@ -14,6 +14,7 @@ pub trait SystemProvider {
     fn get_process_by_pid(&self, pid: u32) -> Result<Process, SystemError>;
     fn find_processes_by_name(&self, name: &str) -> Result<Vec<Process>, SystemError>;
     fn find_process_by_port(&self, port: u16) -> Result<Process, SystemError>;
+    fn get_all_pids(&self) -> Result<Vec<u32>, SystemError>;
 }
 
 #[cfg(test)]
