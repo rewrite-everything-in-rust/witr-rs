@@ -84,25 +84,23 @@ fn refresh_data(app: &mut App, service: &WitrService<RealSystem>) {
         } else {
             app.title = format!(" Witr-RS Watch Mode (Process {} Lost) ", pid);
         }
-    } else {
-        if let Ok(_pids) = service.get_all_pids() {
-            let procs = Vec::new();
-            // TODO: Fetching all process details is resource intensive.
-            // We disabled this for now to optimize performance later.
+    } else if let Ok(_pids) = service.get_all_pids() {
+        let procs = Vec::new();
+        // TODO: Fetching all process details is resource intensive.
+        // We disabled this for now to optimize performance later.
 
-            /*
-            for pid in pids.iter().take(300) {
-                 if let Ok(p) = service.inspect_pid(*pid) {
-                     procs.push(p);
-                 }
-            }
-            procs.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(std::cmp::Ordering::Equal));
-            */
-
-            // Placeholder to indicate Global Mode is active but limited
-            app.title =
-                " Witr-RS Global Monitor (Detail Fetch Disabled - CPU Optimized) ".to_string();
-            app.set_data(procs); // Empty list for now
+        /*
+        for pid in pids.iter().take(300) {
+                if let Ok(p) = service.inspect_pid(*pid) {
+                    procs.push(p);
+                }
         }
+        procs.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(std::cmp::Ordering::Equal));
+        */
+
+        // Placeholder to indicate Global Mode is active but limited
+        app.title =
+            " Witr-RS Global Monitor (Detail Fetch Disabled - CPU Optimized) ".to_string();
+        app.set_data(procs); // Empty list for now
     }
 }
