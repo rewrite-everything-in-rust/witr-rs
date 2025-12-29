@@ -45,7 +45,15 @@
 
 ## Installation
 
-### Pre-built Binaries (Recommended)
+### Quick Install (Linux & macOS)
+
+Use this one-liner to automatically download and install the correct binary for your system:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rewrite-everything-in-rust/witr-rs/main/install.sh | sudo bash
+```
+
+### Pre-built Binaries (Manual)
 
 Download the latest binary for your OS directly. These links always point to the latest release version.
 
