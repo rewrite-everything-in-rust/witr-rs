@@ -1,0 +1,25 @@
+[package]
+name = "witr-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["The witr-rs Authors"]
+license = "Apache-2.0"
+description = "A Rust rewrite of witr - explains why processes are running"
+repository = "https://github.com/rewrite-everything-in-rust/witr-rs"
+keywords = ["process", "monitoring", "cli", "system", "debugging"]
+categories = ["command-line-utilities", "development-tools::debugging"]
+readme = "README.md"
+
+[dependencies]
+clap = { version = "4.5.53", features = ["derive"] }
+sysinfo = "0.37.2"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.148"
+anyhow = "1.0.100"
+thiserror = "2.0.17"
+regex = "1.10"
+chrono = "0.4"
+colored = "2.1"
+
+[dev-dependencies]
+mockall = "0.14.0"
