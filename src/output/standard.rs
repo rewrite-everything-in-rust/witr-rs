@@ -25,19 +25,19 @@ pub fn print(target: &Process, chain: &[Process], colors: &ColorScheme) {
         println!("{}        : {}", colors.metadata("User"), uid);
     }
 
-    if target.container.is_some() {
+    if let Some(container) = &target.container {
         println!(
             "{}   : {}",
             colors.metadata("Container"),
-            target.container.as_ref().unwrap()
+            container
         );
     }
 
-    if target.service.is_some() {
+    if let Some(service) = &target.service {
         println!(
             "{}     : {}",
             colors.metadata("Service"),
-            target.service.as_ref().unwrap()
+            service
         );
     }
 

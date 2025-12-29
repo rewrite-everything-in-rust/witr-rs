@@ -3,6 +3,7 @@ pub mod cmdline;
 pub mod fd;
 pub mod filecontext;
 pub mod net;
+pub use net::*;
 pub mod process;
 pub mod resource;
 pub mod socketstate;
