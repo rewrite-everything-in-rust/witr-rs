@@ -1,4 +1,4 @@
-use crate::adapters::network;
+use crate::adapters::proc as network;
 use crate::adapters::source;
 use crate::core::models::Process;
 use crate::core::ports::{SystemError, SystemProvider};

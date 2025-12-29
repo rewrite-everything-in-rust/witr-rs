@@ -34,6 +34,14 @@ pub fn get_health_status(
     "healthy".to_string()
 }
 
+pub fn detect_forked(parent_pid: Option<u32>) -> String {
+    if parent_pid == Some(1) || parent_pid.is_none() {
+        "no".to_string()
+    } else {
+        "forked".to_string()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,13 +79,5 @@ mod tests {
             get_health_status(1, ProcessStatus::Run, mem, 10.0, recent_start),
             "healthy"
         );
-    }
-}
-
-pub fn detect_forked(parent_pid: Option<u32>) -> String {
-    if parent_pid == Some(1) || parent_pid.is_none() {
-        "no".to_string()
-    } else {
-        "forked".to_string()
     }
 }
