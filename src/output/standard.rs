@@ -26,19 +26,11 @@ pub fn print(target: &Process, chain: &[Process], colors: &ColorScheme) {
     }
 
     if let Some(container) = &target.container {
-        println!(
-            "{}   : {}",
-            colors.metadata("Container"),
-            container
-        );
+        println!("{}   : {}", colors.metadata("Container"), container);
     }
 
     if let Some(service) = &target.service {
-        println!(
-            "{}     : {}",
-            colors.metadata("Service"),
-            service
-        );
+        println!("{}     : {}", colors.metadata("Service"), service);
     }
 
     if !target.cmd.is_empty() {
