@@ -5,12 +5,16 @@ pub mod linux;
 
 // Re-export platform-specific implementations
 #[cfg(target_os = "macos")]
-pub use darwin::net::{get_listening_sockets, get_sockets_for_pid, SocketInfo};
+pub use crate::core::models::SocketInfo;
+#[cfg(target_os = "macos")]
+pub use darwin::net::{get_listening_sockets, get_sockets_for_pid};
 #[cfg(target_os = "macos")]
 pub use darwin::socketstate::get_socket_state;
 
 #[cfg(target_os = "linux")]
-pub use linux::net::{get_listening_sockets, get_sockets_for_pid, SocketInfo};
+pub use crate::core::models::SocketInfo;
+#[cfg(target_os = "linux")]
+pub use linux::net::{get_listening_sockets, get_sockets_for_pid};
 #[cfg(target_os = "linux")]
 pub use linux::socketstate::get_socket_state;
 
