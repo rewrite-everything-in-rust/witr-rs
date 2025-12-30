@@ -1,10 +1,6 @@
+use crate::core::models::SocketInfo;
 use std::collections::HashMap;
 use std::fs;
-
-pub struct SocketInfo {
-    pub port: u16,
-    pub local_addr: String,
-}
 
 pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
     let mut sockets = HashMap::new();
@@ -28,13 +24,13 @@ fn parse_tcp_file(content: &str) -> HashMap<u64, SocketInfo> {
             if let Some(local_addr) = parts.get(1) {
                 if let Some((ip, port)) = parse_ip_port(local_addr) {
                     if let Ok(inode) = parts[9].parse::<u64>() {
-                        sockets.insert(
-                            inode,
-                            SocketInfo {
-                                port,
-                                local_addr: ip.to_string(),
-                            },
+                        let info = SocketInfo::new(
+                            port,
+                            "LISTEN".to_string(),
+                            ip.to_string(),
+                            "0.0.0.0:0".to_string(),
                         );
+                        sockets.insert(inode, info);
                     }
                 }
             }
@@ -43,7 +39,7 @@ fn parse_tcp_file(content: &str) -> HashMap<u64, SocketInfo> {
     sockets
 }
 
-fn parse_ip_port(hex_str: &str) -> Option<(std::net::IpAddr, u16)> {
+pub fn parse_ip_port(hex_str: &str) -> Option<(std::net::IpAddr, u16)> {
     let (ip_hex, port_hex) = hex_str.rsplit_once(':')?;
     let port = u16::from_str_radix(port_hex, 16).ok()?;
 

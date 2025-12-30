@@ -23,6 +23,10 @@ impl<S: SystemProvider> WitrService<S> {
         self.sys.find_process_by_port(port)
     }
 
+    pub fn get_all_pids(&self) -> Result<Vec<u32>, SystemError> {
+        self.sys.get_all_pids()
+    }
+
     pub fn inspect_all(&self) -> Result<Vec<crate::core::models::InspectionResult>, SystemError> {
         let pids = self.sys.get_all_pids()?;
         let mut results = Vec::new();
@@ -100,10 +104,13 @@ mod tests {
                     ports: vec![],
                     bind_addrs: vec![],
                     port_states: vec![],
+                    sockets: vec![],
                     restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
+                    cpu_usage: 0.0,
+                    memory_usage: 0,
                 })
             });
 
@@ -139,10 +146,13 @@ mod tests {
                     ports: vec![],
                     bind_addrs: vec![],
                     port_states: vec![],
+                    sockets: vec![],
                     restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
+                    cpu_usage: 0.0,
+                    memory_usage: 0,
                 })
             });
 
@@ -167,10 +177,13 @@ mod tests {
                     ports: vec![],
                     bind_addrs: vec![],
                     port_states: vec![],
+                    sockets: vec![],
                     restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
+                    cpu_usage: 0.0,
+                    memory_usage: 0,
                 })
             });
 
@@ -195,10 +208,13 @@ mod tests {
                     ports: vec![],
                     bind_addrs: vec![],
                     port_states: vec![],
+                    sockets: vec![],
                     restart_count: None,
                     health: "healthy".into(),
                     forked: "unknown".into(),
                     env: vec![],
+                    cpu_usage: 0.0,
+                    memory_usage: 0,
                 })
             });
 

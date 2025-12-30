@@ -3,10 +3,6 @@ use crate::core::models::InspectionResult;
 use colored::Colorize;
 
 pub fn print_report(results: &[InspectionResult], colors: &ColorScheme) {
-    println!("{}", colors.header("SECURITY SCAN REPORT"));
-    println!("{}", colors.header("===================="));
-    println!();
-
     if results.is_empty() {
         println!(
             "{}",

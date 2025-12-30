@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, dev]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, dev]
 
 env:
   CARGO_TERM_COLOR: always
@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-14]
         rust: [stable, beta]
 
     steps:
@@ -63,6 +63,37 @@ jobs:
       - name: Run integration tests
         run: cargo test --test integration_test --verbose
 
+  test-distros:
+    name: Test on Linux Distros
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [archlinux:latest, fedora:latest]
+    container:
+      image: ${{ matrix.distro }}
+    steps:
+      - name: Install dependencies (Arch)
+        if: contains(matrix.distro, 'archlinux')
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel curl git gcc
+
+      - name: Install dependencies (Fedora)
+        if: contains(matrix.distro, 'fedora')
+        run: |
+          dnf -y update
+          dnf -y install make gcc curl git
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run tests
+        run: cargo test --all --verbose
+
   build-release:
     name: Build Release Binary
     runs-on: ${{ matrix.os }}
@@ -77,10 +108,14 @@ jobs:
             target: x86_64-pc-windows-msvc
             artifact_name: witr-rs.exe
             asset_name: witr-rs-windows-amd64.exe
-          - os: macos-latest
+          - os: macos-14 # Intel build on M1 runner
             target: x86_64-apple-darwin
             artifact_name: witr-rs
             asset_name: witr-rs-macos-amd64
+          - os: macos-14 # Apple Silicon build on M1 runner (Native)
+            target: aarch64-apple-darwin
+            artifact_name: witr-rs
+            asset_name: witr-rs-macos-arm64
 
     steps:
       - name: Checkout code

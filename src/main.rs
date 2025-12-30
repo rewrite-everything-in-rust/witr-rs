@@ -36,6 +36,9 @@ struct Args {
 
     #[arg(long, aliases = ["sec", "scan"])]
     security_scan: bool,
+
+    #[arg(long, help = "Live watch mode")]
+    watch: bool,
 }
 
 fn main() -> Result<()> {
@@ -44,6 +47,38 @@ fn main() -> Result<()> {
 
     let sys_adapter = RealSystem::new();
     let service = WitrService::new(sys_adapter);
+
+    if args.watch {
+        let mut target_pid = args.pid;
+
+        if target_pid.is_none() {
+            if let Some(name) = &args.name {
+                if let Ok(procs) = service.inspect_name(name) {
+                    if let Some(p) = procs.first() {
+                        target_pid = Some(p.pid);
+                    }
+                }
+            } else if let Some(port) = args.port {
+                if let Ok(p) = service.inspect_port(port) {
+                    target_pid = Some(p.pid);
+                }
+            }
+        }
+
+        if let Some(pid) = target_pid {
+            if let Err(e) = witr_rs::tui::run::run_tui(Some(pid)) {
+                eprintln!("Error running TUI: {}", e);
+            }
+            return Ok(());
+        } else {
+            eprintln!(
+                "Global Watch Mode is currently disabled/WIP (Performance Optimization pending)."
+            );
+            eprintln!("Please specify a process target (PID, Name, or Port).");
+            eprintln!("Usage: witr-rs <NAME> --watch OR witr-rs -p <PID> --watch");
+            return Ok(());
+        }
+    }
 
     if args.env {
         if let Some(pid) = args.pid {
@@ -56,10 +91,59 @@ fn main() -> Result<()> {
     }
 
     if args.security_scan {
-        println!("Scanning all processes for security issues... (this may take a moment)");
-        match service.inspect_all() {
-            Ok(results) => output::security::print_report(&results, &colors),
-            Err(e) => eprintln!("Error: {}", e),
+        let targets = if let Some(pid) = args.pid {
+            match service.get_inspection(pid) {
+                Ok(r) => vec![r],
+                Err(e) => {
+                    eprintln!("Error inspecting PID {}: {}", pid, e);
+                    return Ok(());
+                }
+            }
+        } else if let Some(name) = &args.name {
+            match service.inspect_name(name) {
+                Ok(procs) => {
+                    let mut results = Vec::new();
+                    for p in procs {
+                        if let Ok(res) = service.get_inspection(p.pid) {
+                            results.push(res);
+                        }
+                    }
+                    results
+                }
+                Err(e) => {
+                    eprintln!("Error inspecting name {}: {}", name, e);
+                    return Ok(());
+                }
+            }
+        } else if let Some(port) = args.port {
+            match service.inspect_port(port) {
+                Ok(p) => match service.get_inspection(p.pid) {
+                    Ok(r) => vec![r],
+                    Err(e) => {
+                        eprintln!("Error getting inspection for PID {}: {}", p.pid, e);
+                        return Ok(());
+                    }
+                },
+                Err(e) => {
+                    eprintln!("Error inspecting port {}: {}", port, e);
+                    return Ok(());
+                }
+            }
+        } else {
+            println!("Scanning all processes for security issues... (this may take a moment)");
+            match service.inspect_all() {
+                Ok(results) => results,
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    return Ok(());
+                }
+            }
+        };
+
+        if !targets.is_empty() {
+            output::security::print_report(&targets, &colors);
+        } else {
+            println!("No targets found to scan.");
         }
         return Ok(());
     }

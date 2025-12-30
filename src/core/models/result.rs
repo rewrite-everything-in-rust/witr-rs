@@ -165,6 +165,7 @@ mod tests {
 
     fn mock_process(pid: u32, name: &str) -> Process {
         Process {
+            sockets: Vec::new(),
             pid,
             parent_pid: Some(1),
             name: name.to_string(),
@@ -186,6 +187,8 @@ mod tests {
             health: "healthy".to_string(),
             forked: "forked".to_string(),
             env: vec![],
+            cpu_usage: 0.0,
+            memory_usage: 0,
         }
     }
 
