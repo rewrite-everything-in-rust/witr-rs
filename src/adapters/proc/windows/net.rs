@@ -100,8 +100,6 @@ pub fn get_socket_state(_pid: u32) -> HashMap<u64, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn test_key_generation() {
         let pid = 1234;

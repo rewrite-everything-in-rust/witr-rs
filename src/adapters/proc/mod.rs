@@ -20,8 +20,8 @@ pub mod windows;
 pub use windows::net::{get_listening_sockets, get_sockets_for_pid};
 #[cfg(target_os = "windows")]
 pub use windows::socketstate::get_socket_state; // Use the robust implementation
-// Note: SocketInfo is now shared from core, we don't strictly need to re-export it from net specific if we use core everywhere
-// But for compatibility with system.rs usage of network::SocketInfo
+                                                // Note: SocketInfo is now shared from core, we don't strictly need to re-export it from net specific if we use core everywhere
+                                                // But for compatibility with system.rs usage of network::SocketInfo
 #[cfg(target_os = "windows")]
 pub use crate::core::models::SocketInfo;
 
