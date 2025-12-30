@@ -1,11 +1,6 @@
+use crate::core::models::SocketInfo;
 use std::collections::HashMap;
 use std::process::Command;
-
-#[derive(Debug, Clone)]
-pub struct SocketInfo {
-    pub port: u16,
-    pub local_addr: String,
-}
 
 pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
     let mut sockets = HashMap::new();
@@ -21,19 +16,22 @@ pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
 
             let proto = parts[0];
             let local_addr = parts[1];
+            let remote_addr = if parts.len() > 2 { parts[2] } else { "" };
 
             let mut pid_str = "";
             let mut is_listening = false;
+            let mut state = "UNKNOWN";
 
             if proto == "TCP" {
                 if parts.len() >= 5 {
-                    let state = parts[3];
+                    state = parts[3];
                     if state == "LISTENING" {
                         pid_str = parts[4];
                         is_listening = true;
                     }
                 }
             } else if proto == "UDP" && parts.len() >= 4 {
+                state = "LISTENING";
                 pid_str = parts.last().unwrap();
                 is_listening = true;
             }
@@ -43,13 +41,15 @@ pub fn get_listening_sockets() -> HashMap<u64, SocketInfo> {
                     if let Ok(p) = port_part.parse::<u16>() {
                         if let Ok(pid) = pid_str.parse::<u32>() {
                             let key = ((pid as u64) << 16) | (p as u64);
-                            sockets.insert(
-                                key,
-                                SocketInfo {
-                                    port: p,
-                                    local_addr: local_addr.to_string(),
-                                },
+
+                            let info = SocketInfo::new(
+                                p,
+                                state.to_string(),
+                                local_addr.to_string(),
+                                remote_addr.to_string(),
                             );
+
+                            sockets.insert(key, info);
                         }
                     }
                 }
@@ -100,15 +100,7 @@ pub fn get_socket_state(_pid: u32) -> HashMap<u64, String> {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_parse_netstat_line() {
-        let line = "  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       1760";
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        assert_eq!(parts[0], "TCP");
-        assert_eq!(parts[1], "0.0.0.0:135");
-        assert_eq!(parts[3], "LISTENING");
-        assert_eq!(parts[4], "1760");
-    }
+    use super::*;
 
     #[test]
     fn test_key_generation() {

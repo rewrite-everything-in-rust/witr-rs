@@ -21,6 +21,8 @@ pub struct Process {
     pub bind_addrs: Vec<String>,
     #[serde(default)]
     pub port_states: Vec<String>,
+    #[serde(default)]
+    pub sockets: Vec<super::SocketInfo>,
     pub restart_count: Option<u32>,
     pub health: String,
     pub forked: String,
